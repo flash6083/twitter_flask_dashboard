@@ -1,0 +1,5 @@
+flask
+jinja2
+tweepy
+psycopg2-binary
+python-dotenv

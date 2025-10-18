@@ -1,0 +1,86 @@
+<!-- web/templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% block title %}Tweets Dashboard{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: { primary: '#1D9BF0' }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen transition">
+  <!-- Header -->
+  <header class="bg-primary text-white py-4 shadow">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-2xl font-bold"><a href="/" class="hover:opacity-90">Tweets Dashboard</a></h1>
+      <button id="themeToggle" class="bg-white text-primary px-3 py-1 rounded text-sm font-semibold hover:bg-gray-200 transition">
+        🌙 Dark Mode
+      </button>
+    </div>
+  </header>
+
+  <!-- Toast Notifications -->
+  <div id="toastContainer" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+  <main class="container mx-auto px-4 py-6">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="px-4 py-3 rounded shadow text-white {% if category == 'success' %}bg-green-600{% else %}bg-yellow-500{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+        <script>
+          // auto-remove toasts after 4s
+          document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('toastContainer');
+            Array.from(container.children).forEach((toast) => {
+              setTimeout(() => toast.remove(), 4000);
+            });
+          });
+        </script>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+  </div>
+
+
+  <script>
+    // 🌙 Dark mode toggle
+    const body = document.body;
+    const themeToggle = document.getElementById('themeToggle');
+
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      const mode = body.classList.contains('dark') ? 'dark' : 'light';
+      localStorage.setItem('theme', mode);
+      themeToggle.textContent = mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    });
+
+    // Update button text on load
+    themeToggle.textContent = body.classList.contains('dark') ? '☀️ Light Mode' : '🌙 Dark Mode';
+     // 🌀 Spinner overlay logic
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    document.addEventListener('submit', () => {
+      loadingOverlay.classList.remove('hidden');
+    });
+</script>
+
+</body>
+</html>
